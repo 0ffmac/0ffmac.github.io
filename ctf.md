@@ -26,10 +26,10 @@ To remotey test and connect [use the link and select binary explotation](https:/
 
 
 
+#### HINTS:
+_Make sure you consider big Endian vs small Endian._
 
-Make sure you consider big Endian vs small Endian.
-
-Changing the address of the return pointer can call different functions.
+_Changing the address of the return pointer can call different functions._
 
 
 **First thing need to check is if we can un 32bit apps on our 64bit System in my case I had to  install ib32-glibc**

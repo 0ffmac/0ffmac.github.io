@@ -1,7 +1,7 @@
-title: Minimalistic
+title: M-A-C
 logo: /assets/img/logo.jpg
-email: person@address.com
-description: Minimalistic is a theme powered by Jekyll.
+#email: person@address.com
+description: Linux and Security Docs
 favicon: true
 color-scheme: auto
 
@@ -24,5 +24,5 @@ navigation:
     sublist:
       - name: Image
         link: ./index.html#small-image
-  - name: Another Page
-    link: ./another-page.html
+  - name: PCEP_Python_Institute
+    link: ./PCEP_Python_Institute.html

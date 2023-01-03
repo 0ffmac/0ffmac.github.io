@@ -11,6 +11,7 @@ ref. https://artifacts.picoctf.net
 
 Tags: 252 
 
+#### You may need to register to picoCTF to access the files
 ---------------------------------------------------------------------------------
 
 #### Description

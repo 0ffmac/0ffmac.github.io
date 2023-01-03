@@ -7,8 +7,8 @@
   position: fixed;
   top: 0;
   bottom: 0;
-  left: 0;
-  right: 0;
+  left: 10;
+  right: 10;
   background: rgba(0, 0, 0, 0.7);
   transition: opacity 500ms;
   visibility: hidden;
@@ -46,17 +46,17 @@
 }
 
 .popup .content {
-  padding-right: 20px;
-  max-height: 30%;
+  padding-right: 10px;
+  max-height: 50%;
   overflow: auto;
   font: 15px/1.5 "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
-@media screen and (max-width: 700px){
+@media screen and (max-width: 800px){
   .box {
-    width: 70%;
+    width: 80%;
   }
   .popup {
-    width: 70%;
+    width: 80%;
   }
 }

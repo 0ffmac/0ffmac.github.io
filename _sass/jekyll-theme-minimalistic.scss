@@ -9,7 +9,7 @@ html {
 body {
   background-color: var(--clr-bg);
   padding: 50px;
-  font: 15px/1.5 "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font: 14px/1.5 "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: var(--clr-text);
   font-weight: 400;
   -ms-overflow-style: -ms-autohiding-scrollbar;
@@ -33,7 +33,7 @@ img {
 
 h1, h2, h3, h4, h5, h6 {
   color: var(--clr-h1-and-bold);
-  margin: 0 0 20px;
+  margin: 0 0 10px;
 }
 
 p, ul, ol, table, pre, dl {
@@ -224,12 +224,13 @@ kbd {
 }
 
 .sidebar {
-  width: 250px;
+  width: 200px;
   float: left;
   position: fixed;
   -webkit-font-smoothing: subpixel-antialiased;
   top: 0;
-  padding: 58px 0 50px 0;
+  margin-left: -150px;
+  padding: 20px 0 10px 0;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -255,9 +256,11 @@ strong {
 }
 
 section {
-  width: 550px;
+  width: 750px;
   float: right;
   padding-bottom:30px;
+  
+  
 }
 
 footer {

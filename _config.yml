@@ -1,7 +1,8 @@
-title: M-A-C
-logo: /assets/img/logo.jpg
+title:     M-A-C
+logo: /assets/img/AvatarMac.png
 #email: person@address.com
-description: Linux and Security Docs
+description:      My Arch Linux and Security Documentation and more
+
 favicon: true
 color-scheme: auto
 
@@ -14,15 +15,20 @@ platforms:
   - name: GitHub
     icon: <i class="fa-brands fa-github"></i>
     link: https://github.com/vaibhavvikas
-  - name: LinkedIn
-    icon: <i class="fa-brands fa-linkedin"></i>
-    link: https://www.linkedin.com/in/vaibhavvikas
+   # name: LinkedIn
+   # icon: <i class="fa-brands fa-linkedin"></i>
+   # link: https://www.linkedin.com/in/vaibhavvikas
 
 navigation:
-  - name: Readme
+  - name: What's this about
     link: ./index.html
-    sublist:
-      - name: Image
-        link: ./index.html#small-image
+    #sublist:
+    #  - name: Image
+    #    link: ./index.html#small-image
   - name: PCEP_Python_Institute
     link: ./PCEP_Python_Institute.html
+  - name: CTF
+    link: ./ctf.html
+  - name: How_to_use_this_theme
+    link: ./How_to_use_this_theme.html
+    

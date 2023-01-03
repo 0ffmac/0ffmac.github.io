@@ -7,11 +7,14 @@
   </ul>
   {% endif %}
 
+
+
+
   {% if site.navigation %}
-  <h3 class="sidebar-h3">Contents:</h3>
+  <br><h2 class="sidebar-h3">Contents:</h2>
   <ul class="content">
   {%- for item in site.navigation %}
-    <li><a href="{{ item.link }}">{{ item.name }}</a>
+    <li><h4><a href="{{ item.link }}">{{ item.name }}</a></h4>
         {% if item.sublist %}
         <ul class="sublist">
             {%- for subitem in item.sublist %}

@@ -16,8 +16,10 @@
     👾 I am very curious and that is why studying ASM, Python, an anything that teach me good lessons
     🗒 I am currently very interested in Pentesting 
 
-
-
+[<img align="left" alt="0ffmac | YouTube" width="22px" src="./src/youtube.png" />][youtube]
+[<img align="left" alt="@mctechnology17 | Instagram" width="22px" src="./src/instagram.png" />][instagram]
+[<img align="left" alt="MC Technology17 | Facebook" width="22px" src="./src/facebook.png" />][facebook]
+[<img align="left" alt="@mctechnology17 | Reddit" width="22px" src="./src/reddit.png" />][reddit]
 ---
 
 <br />

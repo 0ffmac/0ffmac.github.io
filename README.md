@@ -2,10 +2,17 @@
 [![MC Technology](src/mctechnology_extendido.GIF)](https://0ffmac.github.io)
 
 <h1 align="center">Hi there, I'm Miquel - M-A-C 0ffmac <img src="./src/wave.gif" width="30px"></h1>
+<table align="right">
+<tr>
+<td>
+[<img align="left" alt="0ffmac | YouTube" width="22px" src="./src/youtube.png" />][youtube]
+[<img align="left" alt="@0ffmac | Instagram" width="22px" src="./src/instagram.png" />][instagram]
+[<img align="left" alt="0ffmac | Facebook" width="22px" src="./src/facebook.png" />][facebook]
+[<img align="left" alt="@0ffmac | Reddit" width="22px" src="./src/reddit.png" />][reddit]
 
-
-
-
+</td>
+</tr>
+</table>
 
   :zap: About me!
 
@@ -16,10 +23,7 @@
     👾 I am very curious and that is why studying ASM, Python, an anything that teach me good lessons
     🗒 I am currently very interested in Pentesting 
 
-[<img align="left" alt="0ffmac | YouTube" width="22px" src="./src/youtube.png" />][youtube]
-[<img align="left" alt="@0ffmac | Instagram" width="22px" src="./src/instagram.png" />][instagram]
-[<img align="left" alt="0ffmac | Facebook" width="22px" src="./src/facebook.png" />][facebook]
-[<img align="left" alt="@0ffmac | Reddit" width="22px" src="./src/reddit.png" />][reddit]
+
 ---
 
 <br />
@@ -64,3 +68,12 @@
 [instagram]: https://www.instagram.com/
 [facebook]: https://m.facebook.com/
 [reddit]:https://www.reddit.com/user/
+  
+  
+[vimtools]: https://github.com/mctechnology17/vimtools
+[jailbreakrepo]: https://mctechnology17.github.io/
+[uiglitch]: https://repo.packix.com/package/com.mctechnology.uiglitch/
+[uiswitches]: https://repo.packix.com/package/com.mctechnology.uiswitches/
+[gm]: https://github.com/mctechnology17/gm
+[youtuberepo]: https://github.com/mctechnology17/youtube_repo_mc_technology
+

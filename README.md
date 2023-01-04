@@ -1,6 +1,6 @@
 
 ---
-<h3 align="center"><img src="./assets/img/banner.gif" width="100px" height="100px"></h3>
+<img align="center"><img src="./assets/img/banner.gif" width="100px" height="100px"></img>
 
 
 [![MC Technology](./assets/img/mctechnology_extendido.GIF)](https://0ffmac.github.io)

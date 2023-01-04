@@ -29,8 +29,7 @@
 </td>
 </tr>
 </table>
-
-<br /><br /><br /><br /><br /><br /><br /><br />
+<br /><br /><br /><br />
 
 <h3 align="center"><img src="./src/0101.GIF" width="25px" height="25px"> Languages and Tools</h3>
 <p align="center">

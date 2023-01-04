@@ -6,7 +6,7 @@
 <tr>
 <td>
 
-[<img align="left" alt="YouTube" width="22px" src="./src/youtube.png" />][youtube]
+[<img align="left" alt="YouTube" width="22px" src="./assets/img/youtube.png" />][youtube]
 [<img align="left" alt="Twitter" width="22px" src="./src/twitter.png" />][twitter]
 [<img align="left" alt="Instagram" width="22px" src="./src/instagram.png" />][instagram]
 [<img align="left" alt="acebook" width="22px" src="./src/facebook.png" />][facebook]

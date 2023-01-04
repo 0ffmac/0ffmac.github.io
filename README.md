@@ -1,8 +1,6 @@
 
 ---
 
-[![Title](./assets/img/banner.gif)
-
 [![MC Technology](./assets/img/mctechnology_extendido.GIF)](https://0ffmac.github.io)
 <h3 align="center"><img src="./assets/img/cabeza.GIF" width="100px" height="100px"></h3>
 <h1 align="center">Hi there, I'm Miquel - M-A-C 0ffmac <img src="./src/wave.gif" width="30px"></h1>

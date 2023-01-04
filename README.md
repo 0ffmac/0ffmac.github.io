@@ -1,5 +1,5 @@
 
-<h3 align="center"><img src="./src/cabeza.GIF" width="30px" height="30px"></h3>
+<h3 align="center"><img src="./assets/img/cabeza.GIF" width="30px" height="30px"></h3>
 
 
 [![MC Technology](src/mctechnology_extendido.GIF)](https://0ffmac.github.io)

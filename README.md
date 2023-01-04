@@ -9,6 +9,17 @@
 
 
 <h1 align="center">Hi there, I'm Miquel - M-A-C 0ffmac <img src="./src/wave.gif" width="30px"></h1>
+
+
+  :zap: About me!
+
+💻 IT Computer Systems Admin and I finally got the time to do some writing 💻!!
+
+    🧗 I love Climging 🏄‍♂️ I love Surfing and love nature
+    🤓 Have we ever stop learning?
+    👾 I am very curious and that is why studying ASM, Python, an anything that teach me good lessons
+    🗒 I am currently very interested in Pentesting 
+
 <table align="right">
 <tr>
 <td>
@@ -21,17 +32,6 @@
 </td>
 </tr>
 </table>
-
-  :zap: About me!
-
-💻 IT Computer Systems Admin and I finally got the time to do some writing 💻!!
-
-    🧗 I love Climging 🏄‍♂️ I love Surfing and love nature
-    🤓 Have we ever stop learning?
-    👾 I am very curious and that is why studying ASM, Python, an anything that teach me good lessons
-    🗒 I am currently very interested in Pentesting 
-
-
 ---
 
 <br />

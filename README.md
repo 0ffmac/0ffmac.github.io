@@ -1,5 +1,10 @@
 
+<h3 align="center"><img src="./src/cabeza.GIF" width="30px" height="30px"></h3>
+
+
 [![MC Technology](src/mctechnology_extendido.GIF)](https://0ffmac.github.io)
+
+---
 
 <h1 align="center">Hi there, I'm Miquel - M-A-C 0ffmac <img src="./src/wave.gif" width="30px"></h1>
 <table align="right">

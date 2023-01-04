@@ -6,8 +6,8 @@
 
 
 
-<details>
-  <summary>:zap: About me!</summary>
+
+  :zap: About me!
 
 🔬 IT Computer Systems Admin and I am currently reloading to new technologies 💻!!
 
@@ -16,7 +16,7 @@
     👾 I am very curious and that is why studying ASM, Python, an anything that teachme good lessons
     🗒 I am currently very interested in Pentesting 
 
-</details>
+
 
 ---
 

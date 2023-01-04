@@ -9,11 +9,11 @@
 
   :zap: About me!
 
-🔬 IT Computer Systems Admin and I am currently reloading to new technologies 💻!!
+🔬 IT Computer Systems Admin and I finally got the time to do some writing 💻!!
 
-    🦾 I love Climging and Surfing!
-    🤓 I’m currently learning everything
-    👾 I am very curious and that is why studying ASM, Python, an anything that teachme good lessons
+    🧗 I love Climging 🏄‍♂️ I love Surfing and love nature
+    🤓 Have we ever stop learning?
+    👾 I am very curious and that is why studying ASM, Python, an anything that teach me good lessons
     🗒 I am currently very interested in Pentesting 
 
 

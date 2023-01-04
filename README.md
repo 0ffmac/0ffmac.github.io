@@ -1,6 +1,6 @@
 
 ---
-<div style="width:100%;height:0;padding-bottom:56%;position:relative;"><img src="https://giphy.com/embed/pOEbLRT4SwD35IELiQ" width="100%" height="25%" style="position:absolute" class="giphy-embed" allowFullScreen></img></div><p><a href="https://giphy.com/gifs/tech-technology-mograph-pOEbLRT4SwD35IELiQ">via GIPHY</a></p>
+<div style="width:90%;height:0;padding-bottom:56%;position:relative;"><img src="https://giphy.com/embed/pOEbLRT4SwD35IELiQ" width="90%" height="10%" style="position:absolute" class="giphy-embed" allowFullScreen></img></div><p><a href="https://giphy.com/gifs/tech-technology-mograph-pOEbLRT4SwD35IELiQ">via GIPHY</a></p>
 
 [![MC Technology](./assets/img/mctechnology_extendido.GIF)](https://0ffmac.github.io)
 <h3 align="center"><img src="./assets/img/cabeza.GIF" width="100px" height="100px"></h3>

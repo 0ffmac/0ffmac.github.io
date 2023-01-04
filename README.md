@@ -1,7 +1,7 @@
 
 ---
-<img align="center"><img src="./assets/img/banner.gif" width="100px" height="100px"></img>
 
+[![Title](./assets/img/banner.gif)
 
 [![MC Technology](./assets/img/mctechnology_extendido.GIF)](https://0ffmac.github.io)
 <h3 align="center"><img src="./assets/img/cabeza.GIF" width="100px" height="100px"></h3>

@@ -14,7 +14,7 @@
 </td>
 </tr>
 </table>
-
+---
   :zap: About me!
 
 🔬 IT Computer Systems Admin and I finally got the time to do some writing 💻!!

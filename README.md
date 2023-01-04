@@ -1,7 +1,7 @@
 
 ---
-<h3 align="center"><img src="https://giphy.com/embed/pOEbLRT4SwD35IELiQ" width="100px" height="100px"></h3>
-![Snake animation](https://github.com/mctechnology17/mctechnology17/blob/output/github-contribution-grid-snake.svg](https://giphy.com/embed/pOEbLRT4SwD35IELiQ)
+<h3 align="center"><img src="./assets/img/banner.gif" width="100px" height="100px"></h3>
+
 
 [![MC Technology](./assets/img/mctechnology_extendido.GIF)](https://0ffmac.github.io)
 <h3 align="center"><img src="./assets/img/cabeza.GIF" width="100px" height="100px"></h3>

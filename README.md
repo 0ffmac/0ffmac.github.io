@@ -6,11 +6,11 @@
 <tr>
 <td>
 
-[<img align="left" alt="MC Technology | YouTube" width="22px" src="./src/youtube.png" />][youtube]
-[<img align="left" alt="@mctechnology17 | Twitter" width="22px" src="./src/twitter.png" />][twitter]
-[<img align="left" alt="@mctechnology17 | Instagram" width="22px" src="./src/instagram.png" />][instagram]
-[<img align="left" alt="MC Technology17 | Facebook" width="22px" src="./src/facebook.png" />][facebook]
-[<img align="left" alt="@mctechnology17 | Reddit" width="22px" src="./src/reddit.png" />][reddit]
+[<img align="left" alt="YouTube" width="22px" src="./src/youtube.png" />][youtube]
+[<img align="left" alt="Twitter" width="22px" src="./src/twitter.png" />][twitter]
+[<img align="left" alt="Instagram" width="22px" src="./src/instagram.png" />][instagram]
+[<img align="left" alt="acebook" width="22px" src="./src/facebook.png" />][facebook]
+[<img align="left" alt="Reddit" width="22px" src="./src/reddit.png" />][reddit]
 
 </td>
 </tr>
@@ -71,11 +71,4 @@
 [facebook]: https://m.facebook.com/
 [reddit]:https://www.reddit.com/user/
   
-  
-[vimtools]: https://github.com/mctechnology17/vimtools
-[jailbreakrepo]: https://mctechnology17.github.io/
-[uiglitch]: https://repo.packix.com/package/com.mctechnology.uiglitch/
-[uiswitches]: https://repo.packix.com/package/com.mctechnology.uiswitches/
-[gm]: https://github.com/mctechnology17/gm
-[youtuberepo]: https://github.com/mctechnology17/youtube_repo_mc_technology
 

@@ -27,8 +27,18 @@ navigation:
     #    link: ./index.html#small-image
   - name: PCEP_Python_Institute
     link: ./PCEP_Python_Institute.html
+    sublist:
+      - name: Operators and Expressions
+        link: ./PCEP_Python_Institute.html#operators-and-expressions
+      - name: Break and Continue
+        link: ./PCEP_Python_Institute.html#break-and-continue
+      - name: The Ugly Vowel Eater
+        link: ./PCEP_Python_Institute.html#the-continue-statement-the-ugly-vowel-eater
   - name: CTF
     link: ./ctf.html
+    sublist:
+      - name: BufferOverflow1
+        link: ./ctf.html#bufferoverflow1
   - name: How_to_use_this_theme
     link: ./How_to_use_this_theme.html
     

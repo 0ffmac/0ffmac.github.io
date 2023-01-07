@@ -555,7 +555,49 @@ _The stack pointer -- also referred to as the extended stack pointer (ESP) -- en
 
 ![image](./assets/img/gdb6.png)
 
-if we still go _ni_ a few steps forward in the program, we end up with a function trying to read a flag.txt so let me create it\
-as I didn't until now
+* if we still go _ni_ a few steps forward in the program, we end up with a function trying to read a flag.txt so let me create it\
+  as I didn't until now
+* A few more _ni_ drops us to the function were we suppose to give the arguments 0xcafef00d and 0xf00df00d
+
+![image](./assets/img/gdb7.png)
+
+Let's examine what is $ebp + 0x8
+
+``` bash
+0x804930c <win+118>        cmp    DWORD PTR [ebp+0x8], 0xcafef00d
+gef➤  x $ebp+0x8
+0xffffd024:     0xf7c08200
+gef➤  
+```
+
+As we can see it compares ebp with 0xcafef00d and as is not equal it fails but we see going forward with
+_ni_ that we endup reaching the return address and it jumps to the main function again.
+
+_We should now provide the arguments 0xcafef00d and 0xf00df00d_. Got to remember the LIFO and we know that de second argument is sent first.
+
+``` python
+**vuln.c**
+void win(unsigned int arg1, unsigned int arg2) {
+  char buf[FLAGSIZE];
+  FILE *f = fopen("flag.txt","r");
+  if (f == NULL) {
+    printf("%s %s", "Please create 'flag.txt' in this directory with your",
+                    "own debugging flag.\n");
+    exit(0);
+  }
+
+  fgets(buf,FLAGSIZE,f);
+  if (arg1 != 0xCAFEF00D)
+    return;
+  if (arg2 != 0xF00DF00D)
+    return;
+  printf(buf);
+}
+```
+
+
+
+
+
 
 

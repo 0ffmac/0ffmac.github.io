@@ -556,7 +556,6 @@ _The stack pointer -- also referred to as the extended stack pointer (ESP) -- en
 ![image](./assets/img/gdb6.png)
 
 * if we still go _ni_ a few steps forward in the program, we end up with a function trying to read a flag.txt so let me create it\
-  as I didn't until now
 * A few more _ni_ drops us to the function were we suppose to give the arguments 0xcafef00d and 0xf00df00d
 
 ![image](./assets/img/gdb7.png)

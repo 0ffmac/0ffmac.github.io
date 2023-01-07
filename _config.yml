@@ -39,6 +39,8 @@ navigation:
     sublist:
       - name: BufferOverflow1
         link: ./ctf.html#bufferoverflow1
+      - name: BufferOverflow2
+        link: ./ctf.html#bufferoverflow2
   - name: How_to_use_this_theme
     link: ./How_to_use_this_theme.html
     

@@ -306,7 +306,8 @@ Tags: 
 
 #### Description
 
-Control the return address and arguments This time you'll need to control the arguments to the function you return to! Can you get the flag from this\
+Control the return address and arguments.\
+This time you'll need to control the arguments to the function you return to! Can you get the flag from this
 
 [Link to the vuln program](https://artifacts.picoctf.net/c/346/vuln)
 

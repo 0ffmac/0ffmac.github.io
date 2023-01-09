@@ -8,7 +8,7 @@ html {
 
 body {
   background-color: var(--clr-bg);
-  padding: 50px;
+  padding: 40px;
   font: 14px/1.5 "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: var(--clr-text);
   font-weight: 400;
@@ -229,8 +229,8 @@ kbd {
   position: fixed;
   -webkit-font-smoothing: subpixel-antialiased;
   top: 0;
-  margin-left: -150px;
-  padding: 20px 0 10px 0;
+  margin-left: -100px;
+  padding: 70px 0 10px 0;
   display: flex;
   flex-direction: column;
   justify-content: space-between;

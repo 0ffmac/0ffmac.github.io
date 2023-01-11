@@ -22,6 +22,8 @@ platforms:
 navigation:
   - name: What's this about
     link: ./index.html
+  - name: HackTheBox-Machines
+    link: ./htb.html
     #sublist:
     #  - name: Image
     #    link: ./index.html#small-image

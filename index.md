@@ -5,7 +5,7 @@ layout: default
 
 
 # Hi! 
-## I'm Miquel and here you my notes from Linux | Security | Pentesting
+## I'm Miquel and here are my notes from Linux | Security | Pentesting
 
 
 

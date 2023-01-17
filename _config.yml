@@ -24,9 +24,11 @@ navigation:
     link: ./index.html
   - name: HackTheBox-Machines
     link: ./htb.html
-    #sublist:
-    #  - name: Image
-    #    link: ./index.html#small-image
+    sublist:
+      - name: Soccer
+        link: ./htb.html#SOCCER
+      - name: Broscience
+        link: ./htb.html#BROSCIENCE
   - name: PCEP_Python_Institute
     link: ./PCEP_Python_Institute.html
     sublist:

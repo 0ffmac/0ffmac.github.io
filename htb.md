@@ -478,6 +478,8 @@ And we've got the flag!
 
 
 # BROSCIENCE
+---
+
 
 ![image](./assets/img/broscience.png)
 

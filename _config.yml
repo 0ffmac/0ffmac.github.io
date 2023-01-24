@@ -29,6 +29,8 @@ navigation:
         link: ./htb.html#soccer
       - name: Broscience
         link: ./htb.html#broscience
+      - name: Mentor
+        link: ./htb.html#mentor
   - name: PCEP_Python_Institute
     link: ./PCEP_Python_Institute.html
     sublist:

@@ -1655,8 +1655,9 @@ Now that we have our RCE, let's try to get a reverse shell, in order to do so:
 * Serve HTTP Server to make available our reverse shell file
 * Generate payloads and execute them 
 * Paste the code in the URL, should endup with something like this:
-
-_http://developers.collect.htb/?page=php://filter/convert.iconv.UTF8.CSISO2022KR|convert.base64-encode|convert.icon.................( looooooooooooooooong striiiiiiiing ).................................UTF7|convert.base64-decode/resource=php://temp_
+```
+_ht`tp://developers.collect.htb/?page=php://filter/convert.iconv.UTF8.CSISO2022KR|convert.base64-encode|convert.icon.................( looooooooooooooooong striiiiiiiing ).................................UTF7|convert.base64-decode/resource=php://temp_
+```
 
 
 ``` bash

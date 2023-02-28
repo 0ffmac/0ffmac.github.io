@@ -31,6 +31,8 @@ navigation:
         link: ./htb.html#broscience
       - name: Mentor
         link: ./htb.html#mentor
+      - name: Pollution
+        link: ./htb.html#pollution
   - name: PCEP_Python_Institute
     link: ./PCEP_Python_Institute.html
     sublist:

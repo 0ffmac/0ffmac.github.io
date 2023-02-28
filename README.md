@@ -1,8 +1,6 @@
-<<<<<<< HEAD
-#
-=======
 
->>>>>>> 08a0745c00dc8bd1ae971fc1ced7b2b26d13c8a8
+
+
 ---
 
 [![MC Technology](./assets/img/mctechnology_extendido.GIF)](https://0ffmac.github.io)
